@@ -30,6 +30,9 @@ if [ "$1" = 'rpmbuild' ]; then
     yum-builddep -y ${SPECFILE}
     rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE}
 
+    # Horrible hack to fix perm issues on CI
+    chmod -R o+w ${TOPDIR}
+
     exit $?
 fi
 
