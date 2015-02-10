@@ -4,7 +4,7 @@
 function defaults {
     : ${SPECFILE="/app/centos/centos.spec"}
     : ${CCGSOURCEDIR="/app"}
-    : ${TOPDIR="/data"}
+    : ${TOPDIR="/data/rpmbuild"}
 
     PATH="${PATH}:${APPEND_PATH}"
 

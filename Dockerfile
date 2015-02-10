@@ -11,6 +11,8 @@ RUN yum install -y \
     yum-utils \
     && yum clean all
 
+RUN mkdir -p /data/rpmbuild
+
 VOLUME ["/app", "/data"]
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
