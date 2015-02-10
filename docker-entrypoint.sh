@@ -4,6 +4,7 @@
 function defaults {
     : ${SPECFILE="/app/centos/centos.spec"}
     : ${CCGSOURCEDIR="/app"}
+    : ${TOPDIR="/data"}
 
     PATH="${PATH}:${APPEND_PATH}"
 
@@ -11,8 +12,9 @@ function defaults {
     echo "CCGSOURCEDIR is ${CCGSOURCEDIR}"
     echo "PATH is ${PATH}"
     echo "APPEND_PATH is ${APPEND_PATH}"
+    echo "TOPDIR is ${TOPDIR}"
 
-    export PATH SPECFILE CCGSOURCEDIR
+    export TOPDIR PATH SPECFILE CCGSOURCEDIR
 }
 
 
@@ -26,7 +28,7 @@ if [ "$1" = 'rpmbuild' ]; then
     echo "[Run] Starting rpmbuild"
 
     yum-builddep -y ${SPECFILE}
-    rpmbuild -bb ${SPECFILE}
+    rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE}
 
     exit $?
 fi
