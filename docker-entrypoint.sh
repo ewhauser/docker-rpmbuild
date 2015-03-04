@@ -1,17 +1,36 @@
 #!/bin/bash
 
 
-function proxy {
+function buildhost {
   BUILD_HOST_FILE=/build_host.txt
-  YUM_PROXY_CONF=/etc/yum.conf
 
   # Determine build host
   netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}' > ${BUILD_HOST_FILE}
+}
+
+
+function proxy {
+  YUM_PROXY_CONF=/etc/yum.conf
 
   # squid proxy if available
   curl -sv  http://`cat ${BUILD_HOST_FILE}`:3128  2>&1 > /dev/null | grep squid-deb-proxy \
     && (echo "proxy=http://$(cat ${BUILD_HOST_FILE}):3128" >> ${YUM_PROXY_CONF}) \
     || echo "No squid proxy detected on docker host"
+}
+
+
+function devpi {
+    PIP_CONF_DIR=/root/.config/pip
+
+    curl -sv  http://`cat ${BUILD_HOST_FILE}`:3141 2>&1 > /dev/null | grep Devpi \
+      && mkdir -p ${PIP_CONF_DIR} \
+      && (echo "[global]" > ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "timeout = 60" >> ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "index-url = http://$(cat ${BUILD_HOST_FILE}):3141/root/pypi/" >> ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "trusted-host = $(cat ${BUILD_HOST_FILE})" >> ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "no-cache-dir = true" >> ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "cache-dir = none" >> ${PIP_CONF_DIR}/pip.conf) \
+      || echo "No devpi detected on docker host"
 }
 
 
@@ -35,8 +54,10 @@ function defaults {
 echo "HOME is ${HOME}"
 echo "WHOAMI is `whoami`"
 
-proxy
 defaults
+buildhost
+proxy
+devpi
 
 # rpmbuild entrypoint
 if [ "$1" = 'rpmbuild' ]; then
