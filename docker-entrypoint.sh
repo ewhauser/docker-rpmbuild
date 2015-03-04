@@ -1,6 +1,20 @@
 #!/bin/bash
 
 
+function proxy {
+  BUILD_HOST_FILE=/build_host.txt
+  YUM_PROXY_CONF=/etc/yum.conf
+
+  # Determine build host
+  netstat -nr | grep '^0\.0\.0\.0' | awk '{print $2}' > ${BUILD_HOST_FILE}
+
+  # squid proxy if available
+  curl -sv  http://`cat ${BUILD_HOST_FILE}`:3128  2>&1 > /dev/null | grep squid-deb-proxy \
+    && (echo "proxy=http://$(cat ${BUILD_HOST_FILE}):3128" >> ${YUM_PROXY_CONF}) \
+    || echo "No squid proxy detected on docker host"
+}
+
+
 function defaults {
     : ${SPECFILE="/app/centos/centos.spec"}
     : ${CCGSOURCEDIR="/app"}
@@ -21,6 +35,7 @@ function defaults {
 echo "HOME is ${HOME}"
 echo "WHOAMI is `whoami`"
 
+proxy
 defaults
 
 # rpmbuild entrypoint
