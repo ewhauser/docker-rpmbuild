@@ -29,7 +29,6 @@ function devpi {
       && (echo "index-url = http://$(cat ${BUILD_HOST_FILE}):3141/root/pypi/" >> ${PIP_CONF_DIR}/pip.conf) \
       && (echo "trusted-host = $(cat ${BUILD_HOST_FILE})" >> ${PIP_CONF_DIR}/pip.conf) \
       && (echo "no-cache-dir = true" >> ${PIP_CONF_DIR}/pip.conf) \
-      && (echo "cache-dir = none" >> ${PIP_CONF_DIR}/pip.conf) \
       || echo "No devpi detected on docker host"
 }
 
