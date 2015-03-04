@@ -29,6 +29,7 @@ function devpi {
       && (echo "index-url = http://$(cat ${BUILD_HOST_FILE}):3141/root/pypi/" >> ${PIP_CONF_DIR}/pip.conf) \
       && (echo "trusted-host = $(cat ${BUILD_HOST_FILE})" >> ${PIP_CONF_DIR}/pip.conf) \
       && (echo "no-cache-dir = true" >> ${PIP_CONF_DIR}/pip.conf) \
+      && (echo "cache-dir = /data/.pipcache" >> ${PIP_CONF_DIR}/pip.conf) \
       || echo "No devpi detected on docker host"
 }
 
@@ -36,7 +37,7 @@ function devpi {
 function defaults {
     : ${SPECFILE="/app/centos/centos.spec"}
     : ${CCGSOURCEDIR="/app"}
-    : ${TOPDIR="/data/rpmbuild"}
+    : ${TOPDIR="/data"}
 
     PATH="${PATH}:${APPEND_PATH}"
 
@@ -62,8 +63,8 @@ devpi
 if [ "$1" = 'rpmbuild' ]; then
     echo "[Run] Starting rpmbuild"
 
-    yum-builddep -y ${SPECFILE}
-    rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE}
+    yum-builddep -y ${SPECFILE} 2>&1 | tee /data/yum-builddep.log
+    rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE} 2>&1 | tee /data/rpmbuild.log
 
     # Horrible hack to fix perm issues on CI
     chmod -R o+w ${TOPDIR}
