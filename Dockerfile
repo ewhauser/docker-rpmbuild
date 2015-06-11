@@ -1,6 +1,6 @@
 #
 FROM muccg/python-base:centos6-2.7
-MAINTAINER ccg <devops@ccg.murdoch.edu.au>
+MAINTAINER https://github.com/muccg
 
 RUN yum install -y \
     autoconf \
