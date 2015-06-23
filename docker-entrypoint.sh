@@ -65,11 +65,12 @@ if [ "$1" = 'rpmbuild' ]; then
 
     yum-builddep -y ${SPECFILE} 2>&1 | tee /data/yum-builddep.log
     rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE} 2>&1 | tee /data/rpmbuild.log
+    RETVAL=$?
 
     # Horrible hack to fix perm issues on CI
     chmod -R o+w ${TOPDIR}
 
-    exit $?
+    exit $RETVAL
 fi
 
 echo "[RUN]: Builtin command not provided [rpmbuild]"
