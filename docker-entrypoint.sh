@@ -64,6 +64,7 @@ if [ "$1" = 'rpmbuild' ]; then
     echo "[Run] Starting rpmbuild"
 
     yum-builddep -y ${SPECFILE} 2>&1 | tee /data/yum-builddep.log
+    set -o pipefail
     rpmbuild --define "_topdir ${TOPDIR}" -bb ${SPECFILE} 2>&1 | tee /data/rpmbuild.log
     RETVAL=$?
 
